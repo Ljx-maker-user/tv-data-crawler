@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电视剧数据分析系统 - Top25榜单</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #e94560;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #e94560, #ff7e5f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: #e6e6e6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            color: #e94560;
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 50px 0 30px;
+            font-size: 2.2rem;
+            color: #e94560;
+        }
+
+        .movie-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .movie-table th, .movie-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .movie-table th {
+            background: rgba(233, 69, 96, 0.3);
+            color: #ff7e5f;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .movie-table th:hover {
+            background: rgba(233, 69, 96, 0.5);
+        }
+
+        .movie-table tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #ff7e5f;
+            text-align: center;
+            width: 70px;
+        }
+
+        .watch-link {
+            color: #4cc9f0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .watch-link:hover {
+            color: #e94560;
+            text-decoration: underline;
+        }
+
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #e6e6e6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: linear-gradient(45deg, #e94560, #ff7e5f);
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6e6e6;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(45deg, #e94560, #ff7e5f);
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #e6e6e6;
+            padding: 10px 20px;
+            border-radius: 30px;
+            width: 300px;
+            margin-right: 10px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .movie-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .search-input {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .search-box {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <h1>电视剧数据分析</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="{{ url_for('charts') }}"><i class="fas fa-chart-line"></i> 数据分析</a></li>
+                    <li><a href="{{ url_for('top250') }}" class="active"><i class="fas fa-star"></i> Top25</a></li>
+                    <li><a href="#contact"><i class="fas fa-envelope"></i> 联系我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="{{ url_for('index') }}" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+
+        <section>
+            <h2 class="section-title">电视剧排行榜 Top 25</h2>
+
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索电视剧名称或主演..." id="searchInput">
+                <button class="filter-btn" id="searchBtn"><i class="fas fa-search"></i> 搜索</button>
+            </div>
+
+            <div class="filter-controls">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="2025">2025年</button>
+                <button class="filter-btn" data-filter="2024">2024年</button>
+                <button class="filter-btn" data-filter="2023">2023年</button>
+                <button class="filter-btn" data-filter="2022">2022年</button>
+                <button class="filter-btn" data-filter="2019">2019年</button>
+            </div>
+
+            <table class="movie-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">排名 <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(1)">电视剧名称 <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(2)">年份 <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(3)">主演 <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(4)">热度 <i class="fas fa-sort"></i></th>
+                        <th>观看网站</th>
+                    </tr>
+                </thead>
+                <tbody id="movie-table-body">
+                    {% for item in data %}
+                    <tr>
+                        <td class="rank">{{ item[0] }}</td>
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[2] }}</td>
+                        <td>{{ item[3] }}</td>
+                        <td>{{ item[4] }}</td>
+                        <td><a href="{{ item[5] if item[5] else '#' }}" class="watch-link" target="_blank">观酷链接</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <footer id="contact">
+        <div class="container">
+            <p>© 2023 电视剧数据分析系统 | 设计精美，数据精准</p>
+            <p>联系我们: info@moviedata.com | 电话: 123-456-7890</p>
+            <p>
+                <i class="fab fa-weibo"></i>
+                <i class="fab fa-weixin"></i>
+                <i class="fab fa-qq"></i>
+                <i class="fab fa-github"></i>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 表格排序功能
+        function sortTable(columnIndex) {
+            const table = document.getElementById('movie-table-body');
+            const rows = Array.from(table.rows);
+            const isNumeric = columnIndex === 0 || columnIndex === 2 || columnIndex === 4;
+            
+            rows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent;
+                let bValue = b.cells[columnIndex].textContent;
+                
+                if (isNumeric) {
+                    aValue = parseInt(aValue) || 0;
+                    bValue = parseInt(bValue) || 0;
+                    return aValue - bValue;
+                } else {
+                    return aValue.localeCompare(bValue, 'zh-CN');
+                }
+            });
+            
+            // 移除所有现有行
+            while (table.firstChild) {
+                table.removeChild(table.firstChild);
+            }
+            
+            // 添加排序后的行
+            rows.forEach(row => table.appendChild(row));
+        }
+        
+        // 初始按排名排序
+        document.addEventListener('DOMContentLoaded', function() {
+            sortTable(0);
+            
+            // 筛选功能
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有active类
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // 添加active类到当前按钮
+                    button.classList.add('active');
+                    
+                    const filter = button.getAttribute('data-filter');
+                    filterTable(filter);
+                });
+            });
+            
+            // 搜索功能
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                const searchText = document.getElementById('searchInput').value.toLowerCase();
+                filterTable('all', searchText);
+            });
+        });
+        
+        // 表格筛选函数
+        function filterTable(yearFilter, searchText = '') {
+            const rows = document.querySelectorAll('#movie-table-body tr');
+            
+            rows.forEach(row => {
+                const year = row.cells[2].textContent;
+                const name = row.cells[1].textContent.toLowerCase();
+                const actors = row.cells[3].textContent.toLowerCase();
+                
+                const yearMatch = yearFilter === 'all' || year === yearFilter;
+                const searchMatch = !searchText || name.includes(searchText) || actors.includes(searchText);
+                
+                if (yearMatch && searchMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

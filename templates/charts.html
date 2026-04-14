@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电视剧数据分析系统 - 数据分析</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #e94560;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #e94560, #ff7e5f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: #e6e6e6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            color: #e94560;
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 50px 0 30px;
+            font-size: 2.2rem;
+            color: #e94560;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff7e5f;
+            font-size: 1.4rem;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6e6e6;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(45deg, #e94560, #ff7e5f);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <h1>电视剧数据分析</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="charts" class="active"><i class="fas fa-chart-line"></i> 数据分析</a></li>
+                    <li><a href="top25"><i class="fas fa-star"></i> Top25</a></li>
+                    <li><a href="#contact"><i class="fas fa-envelope"></i> 联系我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="index" class="back-btn"><i class="fas fa-arrow-left"></i> 返回首页</a>
+
+        <section>
+            <h2 class="section-title">数据可视化</h2>
+
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">电视剧类型分布</h3>
+                    <canvas id="genreChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">历年电视剧数量</h3>
+                    <canvas id="yearlyChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">热度分布</h3>
+                    <canvas id="popularityChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3 class="chart-title">主演作品数量</h3>
+                    <canvas id="actorChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer id="contact">
+        <div class="container">
+            <p>© 2023 电视剧数据分析系统 | 设计精美，数据精准</p>
+            <p>联系我们: info@moviedata.com | 电话: 123-456-7890</p>
+            <p>
+                <i class="fab fa-weibo"></i>
+                <i class="fab fa-weixin"></i>
+                <i class="fab fa-qq"></i>
+                <i class="fab fa-github"></i>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从API获取统计数据
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(stats => {
+                    // 历年电视剧数量图表
+                    const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
+                    const yearlyChart = new Chart(yearlyCtx, {
+                        type: 'line',
+                        data: {
+                            labels: stats.years,
+                            datasets: [{
+                                label: '电视剧数量',
+                                data: stats.year_counts,
+                                borderColor: '#e94560',
+                                backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                                fill: true,
+                                tension: 0.3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#e6e6e6'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#e6e6e6'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#e6e6e6'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 热度分布图表
+                    const popularityCtx = document.getElementById('popularityChart').getContext('2d');
+                    const popularityChart = new Chart(popularityCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: stats.pop_ranges,
+                            datasets: [{
+                                label: '电视剧数量',
+                                data: stats.pop_counts,
+                                backgroundColor: '#ff7e5f'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#e6e6e6'
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#e6e6e6'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#e6e6e6'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 主演作品数量图表
+                    const actorCtx = document.getElementById('actorChart').getContext('2d');
+                    const actorChart = new Chart(actorCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: stats.top_actors,
+                            datasets: [{
+                                data: stats.actor_counts,
+                                backgroundColor: [
+                                    '#e94560', '#ff7e5f', '#0f3460', '#533483', '#2bae66', '#f9a828'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#e6e6e6'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+
+            // 类型分布图表（暂时使用静态数据，因为API中没有提供类型数据）
+            const genreCtx = document.getElementById('genreChart').getContext('2d');
+            const genreChart = new Chart(genreCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['剧情', '喜剧', '动作', '动画', '科幻', '爱情', '犯罪', '其他'],
+                    datasets: [{
+                        data: [35, 20, 15, 12, 8, 5, 3, 2],
+                        backgroundColor: [
+                            '#e94560', '#ff7e5f', '#0f3460', '#533483', '#2bae66', '#f9a828', '#6a11cb', '#2575fc'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e6e6e6'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
